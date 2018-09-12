@@ -19,6 +19,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Graficos" />
+        <activity android:name=".Imagen" />
+        <activity android:name=".Video" />
+        <activity android:name=".Audio"></activity>
     </application>
 
 </manifest>
