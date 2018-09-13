@@ -1,9 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".Imagen">
 
-</android.support.constraint.ConstraintLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="10dp">
+        <ImageView
+            android:layout_margin="20dp"
+            android:elevation="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:src="@drawable/camara"
+            android:id="@+id/image_imagen"/>
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_imagen_ruta"
+        android:text="Ruta: ningún archivo seleccionado."
+        android:textSize="20sp"
+        android:layout_gravity="center"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_imagen_abrir"
+            android:background="#4DB6AC"
+            android:layout_marginRight="10dp"
+            android:text="ABRIR"
+            android:textColor="#ffffff"
+            android:theme="@style/Widget.AppCompat.Button.Borderless"
+            />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_imagen_iniciar"
+            android:background="#4DB6AC"
+            android:text="INICIAR GRABACIÓN"
+            android:textColor="#ffffff"
+            android:theme="@style/Widget.AppCompat.Button.Borderless"
+            />
+    </LinearLayout>
+
+</LinearLayout>
