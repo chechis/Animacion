@@ -3,7 +3,6 @@ package com.chechis.multimedia;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -23,27 +22,36 @@ import java.io.File;
 
 public class Imagen extends AppCompatActivity {
 
+    private static final String[] PERMISOS = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
     private Bitmap bitmap = null;
     private ImageView imageView;
-    private Button camara;
-    private String nombreArchivo = "";
     private static final int REQUEST_CODE = 1;
+
+
+    private String nombreArchivo = "foto";
+
     private int numMostrar = 0;
 
     private static final String FOLDER = "/Examen/";
     private static final String FORMATO = ".jpg";
 
-    private TextView rutaTxt;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        int leer = ActivityCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if(leer == PackageManager.PERMISSION_DENIED){
+            ActivityCompat.requestPermissions(this, PERMISOS, REQUEST_CODE);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_imagen);
 
 
         imageView = (ImageView) findViewById(R.id.image_imagen);
-        camara = (Button) findViewById(R.id.btn_imagen_iniciar);
+        Button camara = (Button) findViewById(R.id.btn_imagen_iniciar);
         Button button = (Button) findViewById(R.id.btn_imagen_abrir);
 
         camara.setOnClickListener(new View.OnClickListener() {
@@ -56,57 +64,62 @@ public class Imagen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i= new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i,2);
+                startActivityForResult(i,REQUEST_CODE);
             }
         });
     }
 
-    protected  void onActivityResult(int requestCode, int resultCode, Intent Data){
-        super.onActivityResult(requestCode,resultCode,Data);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode ==2 && resultCode==RESULT_OK && null !=Data){
-            Uri imagenseleccionada = Data.getData();
-            String[] path = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(imagenseleccionada,path,null,null,null);
-            cursor.moveToFirst();
-            int columna = cursor.getColumnIndex(path[0]);
-            String pathimagen = cursor.getString(columna);
-            cursor.close();
-            bitmap = BitmapFactory.decodeFile(pathimagen);
-            BitmapFactory.Options options= new BitmapFactory.Options();
-            int height= bitmap.getHeight();
-            int width=bitmap.getWidth();
-            float scaleA =((float)(width/2))/width;
-            float scaleB =((float)(height/2))/height;
-            Matrix matrix = new Matrix();
-            matrix.postScale(scaleA,scaleB);
-            Bitmap nuevaimagen= Bitmap.createBitmap(bitmap,0,0,width,height,matrix,true);
-            imageView.setImageBitmap(nuevaimagen);
-
-            String ruta = Environment.getExternalStorageDirectory()+ FOLDER+
-                    nombreArchivo+ FORMATO;
-            rutaTxt.setText(ruta);
-
-
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            //mostrarFoto();
+            Toast.makeText(this, "Se ha guardado la imagen", Toast.LENGTH_SHORT).show();
         }else {
-            Toast.makeText(this, "Ocurrió un error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ocurrio un error al guardar la imagen", Toast.LENGTH_SHORT).show();
         }
 
     }
 
     private void guardarFoto (){
-        nombreArchivo = "foto";
-        Intent camaraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        File imagenFolder = new File(Environment.getExternalStorageDirectory(), FOLDER);
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File imagenFolder = new File(Environment.getExternalStorageDirectory(), "CamaraFolder");
         imagenFolder.mkdirs();
 
-        File imagen = new File(imagenFolder, nombreArchivo + FORMATO);
+        File imagen = new File(imagenFolder, "captura.jpg");
+
         Uri uriImagen = Uri.fromFile(imagen);
 
-        camaraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImagen);
-        startActivityForResult(camaraIntent, REQUEST_CODE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImagen);
+
+        startActivityForResult(cameraIntent, REQUEST_CODE);
 
     }
 
+    private void mostrarFoto (){
+
+        String ruta = Environment.getExternalStorageDirectory()+
+                FOLDER + nombreArchivo + FORMATO;
+
+        Toast.makeText(this, "Se ha guardado la imagen:\n" + ruta, Toast.LENGTH_LONG).show();
+
+        Bitmap bitmap = BitmapFactory.decodeFile(ruta);
+
+        int height = bitmap.getHeight();
+        int width = bitmap.getWidth();
+
+        float scaleA = ((float)(width/2))/width;
+        float scaleB = ((float)(height/2))/height;
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleA,scaleB);
+
+        Bitmap nuevaImagen = Bitmap.createBitmap(bitmap,0,0,width,height,matrix,true);
+
+
+        imageView.setImageBitmap(nuevaImagen);
+
+
+    }
 }

@@ -3,7 +3,10 @@ package com.chechis.multimedia;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -16,24 +19,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int REQUEST_CODE=1;
     private static final String[] PERMISOS={
-            Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+
+    private Button botonCamara;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int leer = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
         int escribir = ActivityCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(leer== PackageManager.PERMISSION_DENIED || escribir == PackageManager.PERMISSION_DENIED){
+        if(escribir == PackageManager.PERMISSION_DENIED){
             ActivityCompat.requestPermissions(this,PERMISOS,REQUEST_CODE);
 
         }
@@ -59,6 +66,40 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+
+
+
+        botonCamara = (Button)findViewById(R.id.btn_camara);
+        botonCamara.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                File imagenFolder = new File(Environment.getExternalStorageDirectory(),"FolderExamen");
+
+                imagenFolder.mkdirs();
+
+                File imagen = new File(imagenFolder , "examenCap.jpg");
+
+                Uri uriImagen = Uri.fromFile(imagen);
+
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImagen);
+
+                startActivityForResult(cameraIntent, 1);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            Toast.makeText(MainActivity.this, "Se ha guardado la imagen:\n" + Environment.getExternalStorageDirectory() + "/CamaraFolder/foto.jpg", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(MainActivity.this, "No se guardó correctamente la imagen en el dispositivo", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
